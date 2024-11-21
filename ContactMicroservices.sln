@@ -3,9 +3,41 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Frontend", "Frontend", "{CDB78174-8D3D-4FA9-82DA-473841254493}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{CB605A3C-5047-4E5B-BD5A-0B1263354A9F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Gateways", "Gateways", "{A56DB0FA-391A-4885-804B-8B2C7DFD837A}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Contact", "Contact", "{0E026585-E2E3-4483-82EC-CCD9EF4CD060}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Report", "Report", "{04C8F22E-7D69-44F6-B924-0012E40CC546}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ContactMicroservices.Services.Contact", "Services\Contact\ContactMicroservices.Services.Contact\ContactMicroservices.Services.Contact.csproj", "{8E7FF675-6D4F-4A5D-A2AA-0F84EF1F9D97}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C9636EFE-3B44-4081-8273-E0B9C94AE0CD}"
+	ProjectSection(SolutionItems) = preProject
+		Ports.txt = Ports.txt
+	EndProjectSection
+EndProject
 Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{8E7FF675-6D4F-4A5D-A2AA-0F84EF1F9D97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8E7FF675-6D4F-4A5D-A2AA-0F84EF1F9D97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8E7FF675-6D4F-4A5D-A2AA-0F84EF1F9D97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8E7FF675-6D4F-4A5D-A2AA-0F84EF1F9D97}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0E026585-E2E3-4483-82EC-CCD9EF4CD060} = {CB605A3C-5047-4E5B-BD5A-0B1263354A9F}
+		{04C8F22E-7D69-44F6-B924-0012E40CC546} = {CB605A3C-5047-4E5B-BD5A-0B1263354A9F}
+		{8E7FF675-6D4F-4A5D-A2AA-0F84EF1F9D97} = {0E026585-E2E3-4483-82EC-CCD9EF4CD060}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {667440DD-C856-4E9F-946E-C503629778FB}
