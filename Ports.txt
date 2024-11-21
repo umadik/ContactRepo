@@ -1,1 +1,2 @@
 ContactService >5011
+docker run --name mongodb -d -p 27017:27017 mongo
