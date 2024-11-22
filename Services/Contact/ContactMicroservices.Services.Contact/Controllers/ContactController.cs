@@ -1,4 +1,5 @@
 ﻿using ContactMicroservices.Services.Contact.Data;
+using DotNetCore.CAP;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
 
@@ -6,13 +7,23 @@ namespace ContactMicroservices.Services.Contact.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ContactController : Controller
+    public class ContactController : ControllerBase
     {
         private readonly MongoDbContext _context;
+        private readonly ICapPublisher _capPublisher;
 
-        public ContactController(MongoDbContext context)
+        public ContactController(MongoDbContext context,ICapPublisher capPublisher)
         {
             _context = context;
+            _capPublisher = capPublisher;
+        }
+
+        [HttpPost("producer-transaction")]
+        public async Task<IActionResult> ProducerTransaction()
+        {
+            var date = DateTime.Now;
+            await _capPublisher.PublishAsync<DateTime>("producer.transaction", date);
+            return Ok(date);
         }
 
         [HttpGet]
