@@ -1,14 +1,16 @@
-using ContactMicroservices.Services.Contact.Data;
-using ContactMicroservices.Services.Contact.Model;
+using ContactMicroservices.Services.Report.Data;
+using ContactMicroservices.Services.Report.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Add services to the container.
 // MongoDB ayarlarýný yapýlandýr
-builder.Services.Configure<ContactDatabaseSettings>(
-    builder.Configuration.GetSection("ContactDatabaseSettings"));
+builder.Services.Configure<ReportDatabaseSettings>(
+    builder.Configuration.GetSection("ReportDatabaseSettings"));
 
 // MongoDbContext'i DI container'a ekle
 builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddHttpClient();
 
 builder.Services.AddCap(options =>
 {
