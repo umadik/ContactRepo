@@ -1,17 +1,25 @@
-using ContactMicroservices.Services.Contact.Data;
-using ContactMicroservices.Services.Contact.Model;
+using ContactMicroservices.Web.Data;
+using ContactMicroservices.Web.Models;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
-//MongoDB ayarlarýný yapýlandýr
+// Add services to the container.
+// HttpClient'ý DI'ye ekle
+builder.Services.AddHttpClient("ApiClient", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5011/api/"); // API'nin base adresi
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
+
+// MongoDB Connection
+// MongoDB ayarlarýný yapýlandýr
 builder.Services.Configure<ContactDatabaseSettings>(
     builder.Configuration.GetSection("ContactDatabaseSettings"));
 
-//MongoDbContext'i DI container'a ekle
-builder.Services.AddSingleton<MongoDbContext>();
+builder.Services.AddScoped<MongoDbContext>();
 
-
-
+// RabbitMQ - CAP Publisher
 builder.Services.AddCap(options =>
 {
     options.UseRabbitMQ(options =>
@@ -31,25 +39,26 @@ builder.Services.AddCap(options =>
         mongodbOptions.DatabaseConnection = "mongodb://localhost:27017";
         mongodbOptions.DatabaseName = "RabbitMQDB";
     });
-
 });
 
-builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddControllersWithViews();
+
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseExceptionHandler("/Home/Error");
 }
+app.UseStaticFiles();
+
+app.UseRouting();
 
 app.UseAuthorization();
 
-app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Contact}/{action=Index}/{id?}");
 
 app.Run();

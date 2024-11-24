@@ -41,6 +41,12 @@ namespace ContactMicroservices.Services.Report.Controllers
         [CapSubscribe("producer.transaction")]
         public void Consumer(DateTime date)
         {
+            Model.Report test = new Model.Report();
+            test.Location = "Istanbul";
+            test.PhoneNumberCount = 2;
+            test.Status = Model.ReportStatus.Preparing;
+
+            _context.Reports.InsertOneAsync(test);
             Console.WriteLine(date);
         }
     }

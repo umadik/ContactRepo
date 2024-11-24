@@ -1,0 +1,45 @@
+﻿@model List<Contact>
+@{
+    ViewData["Title"] = "Ana Sayfa";
+}
+
+<div class="container mt-4">
+    <h1 class="text-left text-success mb-4">Kişi Listesi</h1>
+
+    <!-- Tablo -->
+    <table class="table table-hover table-striped">
+        <thead class="table-success">
+            <tr>
+                <th scope="col">Ad</th>
+                <th scope="col">Soyad</th>
+                <th scope="col">Firma</th>
+                <th scope="col" class="text-center">İşlemler</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var contact in Model)
+            {
+                <tr>
+                    <td>@contact.FirstName</td>
+                    <td>@contact.LastName</td>
+                    <td>@contact.Company</td>
+                    <td class="text-center">
+                        <form method="post" action="@Url.Action("Delete", "Contact", new { id = contact.Id })">
+                            <button type="submit" class="btn btn-danger btn-sm">Sil</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <!-- RabbitMQ Producer Transaction Butonu -->
+    <form method="post" action="@Url.Action("ProducerTransaction", "Contact")" class="text-center">
+        <button type="submit" class="btn btn-success">RabbitMQ ile Veri Gönder</button>
+    </form>
+
+    <!-- Yeni Kişi Ekle Bağlantısı -->
+    <div class="text-center mt-3">
+        <a href="@Url.Action("Create", "Contact")" class="btn btn-primary">Yeni Kişi Ekle</a>
+    </div>
+</div>

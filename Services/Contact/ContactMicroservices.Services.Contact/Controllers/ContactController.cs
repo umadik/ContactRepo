@@ -37,7 +37,7 @@ namespace ContactMicroservices.Services.Contact.Controllers
         public async Task<IActionResult> CreateContact([FromBody] Model.Contact contact)
         {
             await _context.Contacts.InsertOneAsync(contact);
-            return CreatedAtAction(nameof(GetContactById), new { id = contact.Id }, contact);
+            return Ok();
         }
 
         [HttpGet("{id}")]
@@ -69,5 +69,6 @@ namespace ContactMicroservices.Services.Contact.Controllers
 
             return NoContent();
         }
+
     }
 }
