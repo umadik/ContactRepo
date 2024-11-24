@@ -11,6 +11,11 @@ builder.Services.AddHttpClient("ApiClient", client =>
     client.BaseAddress = new Uri("http://localhost:5011/api/"); // API'nin base adresi
     client.DefaultRequestHeaders.Add("Accept", "application/json");
 });
+builder.Services.AddHttpClient("ApiClient2", client =>
+{
+    client.BaseAddress = new Uri("http://localhost:5012/api/"); // API2 base address
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+});
 
 // MongoDB Connection
 // MongoDB ayarlarýný yapýlandýr

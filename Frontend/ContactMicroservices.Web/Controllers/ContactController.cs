@@ -1,23 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using DotNetCore.CAP;
 using MongoDB.Driver;
 using ContactMicroservices.Web.Data;
 using ContactMicroservices.Web.Models;
-using Amazon.Runtime;
 
 namespace ContactMicroservices.Web.Controllers
 {
     public class ContactController : Controller
     {
         private readonly MongoDbContext _context;
-        private readonly ICapPublisher _capPublisher;
         private readonly IHttpClientFactory _httpClientFactory;
 
 
-        public ContactController(IHttpClientFactory httpClientFactory,MongoDbContext context, ICapPublisher capPublisher)
+        public ContactController(IHttpClientFactory httpClientFactory,MongoDbContext context)
         {
             _context = context;
-            _capPublisher = capPublisher;
             _httpClientFactory = httpClientFactory;
 
         }
@@ -208,17 +204,6 @@ namespace ContactMicroservices.Web.Controllers
             }
 
             return NoContent(); // Başarılı ama içerik dönmüyor
-        }
-
-
-
-        // Producer Transaction (RabbitMQ)
-        [HttpPost("producer-transaction")]
-        public async Task<IActionResult> ProducerTransaction()
-        {
-            var date = DateTime.Now;
-            await _capPublisher.PublishAsync<DateTime>("producer.transaction", date);
-            return Ok("Attım: " + date);
         }
 
         // Create view for the contact form

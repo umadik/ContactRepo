@@ -20,7 +20,7 @@ namespace ContactMicroservices.Services.Report.Controllers
             _httpClient = httpClientFactory.CreateClient();
         }
 
-        [HttpGet]
+        [HttpGet("get-all")]
         public async Task<IActionResult> GetAllReports()
         {
             var reports = await _context.Reports.Find(_ => true).ToListAsync();
@@ -39,15 +39,45 @@ namespace ContactMicroservices.Services.Report.Controllers
 
         [ApiExplorerSettings(IgnoreApi = true)]
         [CapSubscribe("producer.transaction")]
-        public void Consumer(DateTime date)
+        public async Task Consumer(string reportId)
         {
-            Model.Report test = new Model.Report();
-            test.Location = "Istanbul";
-            test.PhoneNumberCount = 2;
-            test.Status = Model.ReportStatus.Preparing;
 
-            _context.Reports.InsertOneAsync(test);
-            Console.WriteLine(date);
+            var report = await _context.Reports.Find(r => r.Id == reportId).FirstOrDefaultAsync();
+            if (report == null)
+            {
+                throw new Exception("Rapor bulunamadı.");
+            }
+
+            var contacts = await _context.Contacts.Find(_ => true).ToListAsync();  // Tüm kontakları alıyoruz
+
+            var locationGroup = contacts
+                .SelectMany(c => c.InfoTypes)
+                .Where(info => info.Type == Model.InfoValueType.Konum)
+                .GroupBy(info => info.Value)  // Konum bazında grupla
+                .ToList();
+
+            foreach (var group in locationGroup)
+            {
+                var location = group.Key;
+                var phoneNumbersInLocation = contacts
+                    .Where(c => c.InfoTypes.Any(i => i.Type == Model.InfoValueType.Konum && i.Value == location))
+                    .SelectMany(c => c.InfoTypes)
+                    .Count(i => i.Type == Model.InfoValueType.TelNo);  // Telefon numarasını say
+
+                var contactCountInLocation = contacts
+                    .Where(c => c.InfoTypes.Any(i => i.Type == Model.InfoValueType.Konum && i.Value == location))
+                    .Count();  // Konumdaki kişi sayısı
+
+                // Raporu güncelle
+                var update = Builders<Model.Report>.Update
+                    .Set(r => r.ContactCount, contactCountInLocation)
+                    .Set(r => r.PhoneNumberCount, phoneNumbersInLocation)
+                    .Set(r => r.Status, Model.ReportStatus.Completed);  // Rapor durumunu tamamlandı olarak güncelle
+
+                await _context.Reports.UpdateOneAsync(r => r.Id == report.Id, update);
+            }
+
+
         }
     }
 }
