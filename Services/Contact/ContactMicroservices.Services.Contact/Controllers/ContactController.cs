@@ -1,4 +1,5 @@
 ﻿using ContactMicroservices.Services.Contact.Data;
+using ContactMicroservices.Services.Contact.Model;
 using DotNetCore.CAP;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Driver;
@@ -51,13 +52,33 @@ namespace ContactMicroservices.Services.Contact.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateContact(string id, [FromBody] Model.Contact updatedContact)
+        public async Task<IActionResult> UpdateContact([FromBody] Model.Contact updatedContact)
         {
-            var result = await _context.Contacts.ReplaceOneAsync(c => c.Id == id, updatedContact);
+            var result = await _context.Contacts.ReplaceOneAsync(c => c.Id == updatedContact.Id, updatedContact);
             if (result.MatchedCount == 0)
                 return NotFound();
 
-            return NoContent();
+            return Ok();
+        }
+
+        [HttpPost("add-detail")]
+        public async Task<IActionResult> AddDetail([FromBody] InfoTypeDetailModel detail)
+        {
+            var filter = Builders<Model.Contact>.Filter.Eq(c => c.Id, detail.ContactId);
+            var update = Builders<Model.Contact>.Update.Push(c => c.InfoTypes, new InfoType
+            {
+                Type = Enum.TryParse<InfoValueType>(detail.Type, out var parsedType) ? parsedType : throw new ArgumentException("Geçersiz tür"),
+                Value = detail.Value
+            });
+
+            var result = await _context.Contacts.UpdateOneAsync(filter, update);
+
+            if (result.ModifiedCount == 0)
+            {
+                return NotFound("Kayıt bulunamadı.");
+            }
+
+            return Ok();
         }
 
         [HttpDelete("{id}")]

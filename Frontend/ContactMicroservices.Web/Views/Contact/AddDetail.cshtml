@@ -1,0 +1,85 @@
+﻿@model InfoTypeDetailModel
+@using System.ComponentModel.DataAnnotations
+@using ContactMicroservices.Web.Extensions
+@{
+    ViewData["Title"] = "Detay Ekle";
+    Func<InfoValueType, DisplayAttribute?> getDisplayAttribute = type => type.GetAttribute<DisplayAttribute>();
+
+}
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">Detay Ekle</h2>
+
+    <form id="detailForm" class="needs-validation" novalidate>
+        <input type="hidden" id="contactId" name="ContactId" value="@ViewBag.ContactId" />
+        <input type="hidden" id="firstName" name="FirstName" value="@Model.FirstName" />
+        <input type="hidden" id="lastName" name="LastName" value="@Model.LastName" />
+        <input type="hidden" id="company" name="Company" value="@Model.Company" />
+
+        <div class="mb-3">
+            <label for="type" class="form-label">Detay Tipi:</label>
+            <select id="type" name="Type" class="form-select" required>
+                <option value="" disabled selected>Detay tipini seçin</option>
+                @foreach (var type in Enum.GetValues(typeof(InfoValueType)).Cast<InfoValueType>())
+                {
+                    <option value="@Convert.ToInt32(type)">@getDisplayAttribute(type)?.Name</option>
+                }
+            </select>
+            <div class="invalid-feedback">
+                Lütfen bir detay tipi seçin.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="value" class="form-label">Detay Değeri:</label>
+            <input type="text"
+                   id="value"
+                   name="Value"
+                   class="form-control"
+                   placeholder="Detay değerini girin"
+                   required />
+            <div class="invalid-feedback">
+                Lütfen detay değerini girin.
+            </div>
+        </div>
+
+        <button type="button" onclick="submitForm()" class="btn btn-primary w-100">
+            Ekle
+        </button>
+    </form>
+</div>
+
+<script>
+    async function submitForm() {
+        const form = document.getElementById("detailForm");
+
+        // Form doğrulaması
+        if (!form.checkValidity()) {
+            form.classList.add("was-validated");
+            return;
+        }
+
+        const detail = {
+            ContactId: form.contactId.value,
+            Id: form.contactId.value,
+            Type: form.type.value,
+            Value: form.value.value,
+            FirstName: form.FirstName.value,
+            LastName: form.LastName.value,
+            Company: form.Company.value
+        };
+
+        const response = await fetch("/Contact/AddDetail", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(detail)
+        });
+
+        if (response.ok) {
+            window.location.href = "/Contact/Index";
+        } else {
+            alert("Detay eklenemedi! Hata: " + response.status);
+        }
+    }
+</script>
