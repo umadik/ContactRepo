@@ -1,0 +1,81 @@
+﻿@model Contact
+@{
+    ViewData["Title"] = "Yeni Kişi Ekle";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">Yeni Kişi Ekle</h2>
+
+    <form id="contactForm" class="needs-validation" novalidate >
+        <div class="mb-3">
+            <label for="name" class="form-label">Ad:</label>
+            <input type="text"
+                   id="name"
+                   name="Name"
+                   class="form-control"
+                   placeholder="Adınızı girin"
+                   required />
+            <div class="invalid-feedback">
+                Lütfen adınızı girin.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="surname" class="form-label">Soyad:</label>
+            <input type="text"
+                   id="surname"
+                   name="Surname"
+                   class="form-control"
+                   placeholder="Soyadınızı girin"
+                   required />
+            <div class="invalid-feedback">
+                Lütfen soyadınızı girin.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="company" class="form-label">Firma:</label>
+            <input type="text"
+                   id="company"
+                   name="Company"
+                   class="form-control"
+                   placeholder="Firma adını girin" />
+        </div>
+
+        <button type="button" onclick="submitForm()"
+                class="btn btn-primary w-100">
+            Ekle
+        </button>
+    </form>
+</div>
+<script>
+    async function submitForm() {
+        const form = document.getElementById("contactForm");
+
+        if (!form.checkValidity()) {
+               // Doğrulama başarısızsa, Bootstrap'in görünümünü aktifleştir
+               form.classList.add('was-validated');
+               return false; // Formun gönderimini engelle
+           }else{
+                const contact = {
+            FirstName: form.name.value,
+            Lastname: form.surname.value,
+            Company: form.company.value
+        };
+
+        const response = await fetch("/Contact/CreateContact", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(contact)
+        });
+
+        if (response.ok) {
+            window.location.href = "/Contact/Index";
+        } else {
+            alert("Kişi eklenemedi! Hata: " + response.status);
+        }
+           }
+    }
+</script>
