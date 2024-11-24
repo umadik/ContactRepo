@@ -1,0 +1,53 @@
+﻿@model List<Report>
+
+@{
+    ViewData["Title"] = "Oluşturulan Raporlar";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center mb-4">@ViewData["Title"]</h2>
+
+    <table class="table table-hover table-striped">
+        <thead class="table-success">
+            <tr>
+                <th scope="col">Lokasyon</th>
+                <th scope="col">Durum</th>
+                <th scope="col">Oluşturulma Tarihi</th>
+                <th scope="col">Kişi Sayısı</th>
+                <th scope="col">Telefon Sayısı</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var report in Model)
+            {
+                <tr>
+                    <td>@report.Location</td>
+                    <td>@report.Status</td>
+                    <td>@report.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss")</td>
+                    <td>@report.ContactCount</td>
+                    <td>@report.PhoneNumberCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <div class="text-center">
+        <!-- RabbitMQ Producer Transaction Butonu -->
+        <form method="post" action="@Url.Action("ProducerTransaction", "Report")" class="text-center">
+            <div class="row">
+                <div class="col-md-4">
+                    <input type="text"
+                           id="city"
+                           name="City"
+                           class="form-control"
+                           placeholder="Şehir Adı"
+                           required />
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-success">Rapor Hazırla</button>
+                    <a href="@Url.Action("Index", "Report")" class="btn btn-primary">Yenile</a>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
