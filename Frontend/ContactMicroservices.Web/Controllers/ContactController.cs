@@ -21,6 +21,36 @@ namespace ContactMicroservices.Web.Controllers
             _httpClientFactory = httpClientFactory;
 
         }
+        [HttpGet]
+        public async Task<IActionResult> GetContactDetails(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("Geçersiz ID.");
+
+            try
+            {
+                var contact = await _context.Contacts
+                    .Find(c => c.Id == id)
+                    .FirstOrDefaultAsync();
+
+                if (contact == null || contact.InfoTypes == null)
+                    return NotFound("Bilgi bulunamadı.");
+
+                // InfoTypes bilgisini döndür
+                var details = contact.InfoTypes.Select(info => new
+                {
+                    type = info.Type.ToString(),
+                    value = info.Value
+                }).ToList();
+
+                return Ok(details);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, $"Sunucu hatası: {ex.Message}");
+            }
+        }
+
 
         [HttpGet]
         public async Task<IActionResult> Index()
@@ -101,6 +131,85 @@ namespace ContactMicroservices.Web.Controllers
             // Liste sayfasına yönlendirme
             return RedirectToAction("Index");
         }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("Geçersiz ID.");
+
+            var contact = await _context.Contacts.Find(c => c.Id == id).FirstOrDefaultAsync();
+
+            if (contact == null)
+                return NotFound("Kişi bulunamadı.");
+
+            return View(contact);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditContact([FromBody] Contact updatedContact)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(updatedContact);
+            }
+
+            var client = _httpClientFactory.CreateClient("ApiClient");
+
+            // API'ye POST isteği gönder
+            var response = await client.PutAsJsonAsync("Contact/UpdateContact", updatedContact);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index", "Contact");
+            }
+
+            // Hata durumunda mesaj döndür
+            ModelState.AddModelError("", "Güncelleme başarısız. Lütfen tekrar deneyin.");
+            return View(updatedContact);
+
+        }
+
+        [HttpGet]
+        public async Task <IActionResult> AddDetail(string id)
+        {
+            if (string.IsNullOrEmpty(id))
+                return BadRequest("Geçersiz ID.");
+            InfoTypeDetailModel infoTypeDetailModel = new InfoTypeDetailModel();
+            var contact = await _context.Contacts.Find(c => c.Id == id).FirstOrDefaultAsync();
+
+            if (contact == null)
+                return NotFound("Kişi bulunamadı.");
+
+            infoTypeDetailModel.FirstName = contact.FirstName;
+            infoTypeDetailModel.LastName = contact. LastName;
+            infoTypeDetailModel.Company = contact.Company;
+
+            ViewBag.ContactId = id; // İlgili kişi ID'si ViewBag ile gönderiliyor
+            return View(infoTypeDetailModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddDetail([FromBody] InfoTypeDetailModel detail)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest("Gönderilen veri geçersiz.");
+            }
+
+            var client = _httpClientFactory.CreateClient("ApiClient");
+
+            // API'ye POST isteği gönder
+            var response = await client.PostAsJsonAsync("Contact/add-detail", detail);
+
+            if (response.IsSuccessStatusCode)
+            {
+                return RedirectToAction("Index", "Contact");
+            }
+
+            return NoContent(); // Başarılı ama içerik dönmüyor
+        }
+
 
 
         // Producer Transaction (RabbitMQ)

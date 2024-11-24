@@ -1,0 +1,88 @@
+﻿@model Contact
+@{
+    ViewData["Title"] = "Kişi Düzenle";
+}
+
+<div class="container mt-4">
+    <h2 class="text-center text-primary mb-4">Kişi Düzenle</h2>
+
+    <form id="contactForm" class="needs-validation" novalidate>
+        <input type="hidden" id="id" name="Id" value="@Model.Id" />
+
+        <div class="mb-3">
+            <label for="name" class="form-label">Ad:</label>
+            <input type="text"
+                   id="name"
+                   name="FirstName"
+                   class="form-control"
+                   placeholder="Adınızı girin"
+                   value="@Model.FirstName"
+                   required />
+            <div class="invalid-feedback">
+                Lütfen adınızı girin.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="surname" class="form-label">Soyad:</label>
+            <input type="text"
+                   id="surname"
+                   name="LastName"
+                   class="form-control"
+                   placeholder="Soyadınızı girin"
+                   value="@Model.LastName"
+                   required />
+            <div class="invalid-feedback">
+                Lütfen soyadınızı girin.
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label for="company" class="form-label">Firma:</label>
+            <input type="text"
+                   id="company"
+                   name="Company"
+                   class="form-control"
+                   placeholder="Firma adını girin"
+                   value="@Model.Company" />
+        </div>
+
+        <button type="button" onclick="submitForm()"
+                class="btn btn-primary w-100">
+            Kaydet
+        </button>
+    </form>
+</div>
+
+<script>
+    async function submitForm() {
+        const form = document.getElementById("contactForm");
+
+        // Form validation kontrolü
+        if (!form.checkValidity()) {
+            form.classList.add('was-validated');
+            return false;
+        } else {
+            const contact = {
+                Id: form.id.value,
+                FirstName: form.name.value,
+                LastName: form.surname.value,
+                Company: form.company.value
+            };
+
+            const response = await fetch("/Contact/EditContact", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(contact)
+            });
+
+            if (response.ok) {
+                window.location.href = "/Contact/Index";
+            } else {
+                alert("Kişi düzenlenemedi! Hata: " + response.status);
+            }
+        }
+    }
+</script>
