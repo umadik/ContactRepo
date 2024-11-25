@@ -37,6 +37,13 @@ namespace ContactMicroservices.Services.Report.Controllers
             return Ok(report);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> CreateReport([FromBody] Model.Report report)
+        {
+            await _context.Reports.InsertOneAsync(report);
+            return Ok();
+        }
+
         [ApiExplorerSettings(IgnoreApi = true)]
         [CapSubscribe("producer.transaction")]
         public async Task Consumer(string reportId)

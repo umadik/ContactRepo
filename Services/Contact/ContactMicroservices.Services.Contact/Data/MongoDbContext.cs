@@ -8,14 +8,14 @@ namespace ContactMicroservices.Services.Contact.Data
     {
 
         private readonly IMongoDatabase _database;
-
+        
         public MongoDbContext(IOptions<ContactDatabaseSettings> settings)
         {
             var client = new MongoClient(settings.Value.ConnectionString);
             _database = client.GetDatabase(settings.Value.DatabaseName);
         }
 
-        public IMongoCollection<Model.Contact> Contacts => _database.GetCollection<Model.Contact>("Contacts");
+        public virtual IMongoCollection<Model.Contact> Contacts => _database.GetCollection<Model.Contact>("Contacts");
 
     }
 }

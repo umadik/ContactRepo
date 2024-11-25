@@ -8,7 +8,7 @@ namespace ContactMicroservices.Services.Report.Data
     {
         private readonly IMongoDatabase _database;
         private readonly IMongoDatabase _contactDatabase;
-
+        
         public MongoDbContext(IOptions<ReportDatabaseSettings> settings)
         {
             var client = new MongoClient(settings.Value.ConnectionString);
@@ -17,8 +17,8 @@ namespace ContactMicroservices.Services.Report.Data
 
         }
 
-        public IMongoCollection<Model.Report> Reports => _database.GetCollection<Model.Report>("Reports");
-        public IMongoCollection<Contact> Contacts => _contactDatabase.GetCollection<Contact>("Contacts");
+        public virtual IMongoCollection<Model.Report> Reports => _database.GetCollection<Model.Report>("Reports");
+        public virtual IMongoCollection<Contact> Contacts => _contactDatabase.GetCollection<Contact>("Contacts");
 
     }
 }
